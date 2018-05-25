@@ -28,9 +28,19 @@
 }
 
 .carousel {
+  border: 2px solid black;
+}
+
+.carousel-list {
   list-style-type: none;
 }
 
 .carousel-element > img {
   height: 100px;
+}
+
+.carousel-container {
+  display: flex;
+  flex-direction: row;
+
 }
