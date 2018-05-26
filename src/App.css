@@ -29,18 +29,24 @@
 
 .carousel {
   border: 2px solid black;
+  margin-right: 50px;
 }
 
 .carousel-list {
   list-style-type: none;
+  padding-left: 0;
 }
 
 .carousel-element > img {
-  height: 100px;
+  height: 200px;
 }
 
 .carousel-container {
   display: flex;
   flex-direction: row;
 
+}
+
+.selected {
+  border: 1px solid gray;
 }

@@ -6,16 +6,21 @@ class ImageCarousel extends Component {
     const originalImages = this.props.images;
     const copy = originalImages.slice();
     const doubled = originalImages.concat(copy);
-    const result = [];
-    for (let index = this.props.selectedIndex; index < originalImages.length + this.props.selectedIndex; index++) {
-      result.push(doubled[index]);
+    let result = [];
+    if (this.props.selectedIndex - this.props.insertElementsBefore >= 0){
+      //result = doubled.slice(this.props.selectedIndex - this.props.insertElementsBefore, originalImages.length + this.props.selectedIndex - this.props.insertElementsBefore);
+      result = doubled.slice(this.props.selectedIndex - this.props.insertElementsBefore, this.props.selectedIndex - this.props.insertElementsBefore + this.props.size);
+    }
+    else {
+      // replace selectedIndex with lastIndexOf it
+      //result = doubled.slice(this.props.selectedIndex + originalImages.length - this.props.insertElementsBefore, 2 * originalImages.length + this.props.selectedIndex - this.props.insertElementsBefore);
+      result = doubled.slice(this.props.selectedIndex + originalImages.length - this.props.insertElementsBefore, this.props.selectedIndex + originalImages.length - this.props.insertElementsBefore + this.props.size);
     }
 
-    const images = result.map(image =>
+
+    const images = result.map((image, index) =>
       (
-        <li key={image} className='carousel-element'>
-        <CarouselImage imageUrl={image} />
-        </li>
+          <CarouselImage key={image} imageUrl={image} selected={index === this.props.insertElementsBefore}/>
       )
     );
     return images;
@@ -25,14 +30,15 @@ class ImageCarousel extends Component {
     const images = this.renderImages();
     return (
       <div className='carousel'>
-      <ul className='carousel-list'>
-      {images}
-      </ul>
-      <button
-      onClick={() => this.props.onHalt(this.props.id)}
-      >
-      stop
-      </button>
+        <ul className='carousel-list'>
+          {images}
+        </ul>
+        <button
+          onClick={() => this.props.onHalt(this.props.id)}
+          type='button'
+        >
+          stop
+        </button>
       </div>
     );
   }

@@ -2,8 +2,14 @@ import React, {Component} from 'react';
 
 class CarouselImage extends Component {
   render() {
+    let className = 'carousel-element';
+    if (this.props.selected) {
+      className = className  + ' selected'
+    }
     return (
-      <img src={this.props.imageUrl} alt='' />
+      <li className={className}>
+        <img src={this.props.imageUrl} alt='' />
+      </li>
     );
   }
 }
