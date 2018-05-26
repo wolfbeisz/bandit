@@ -52,23 +52,23 @@ class App extends Component {
 
 // todo: respect asynchronity of setState
   tick() {
-    this.setState({
-      carousels: this.state.carousels.map(config => {
+    this.setState((prevState, props) => ({
+      carousels: prevState.carousels.map(config => {
         if (config.halted) {
           return config;
         }
         return {
           id: config.id,
           images: config.images,
-          selectedIndex: this.calculateNextIndex(config.selectedIndex, config.images.length),
+          selectedIndex: this.calculateNextIndex(prevState, config.selectedIndex, config.images.length),
           halted: config.halted
         }
       })
-    });
+    }));
   }
 
-  calculateNextIndex(curIndex, imageCount) {
-    if (this.state.slideDirectionDown) {
+  calculateNextIndex(state, curIndex, imageCount) {
+    if (state.slideDirectionDown) {
       let index = curIndex - 1;
       if (index < 0) {
         index = index + imageCount;
@@ -79,8 +79,8 @@ class App extends Component {
   }
 
   haltCarousel(carouselId) {
-    this.setState({
-      carousels: this.state.carousels.map(config => {
+    this.setState((prevState, props) => ({
+      carousels: prevState.carousels.map(config => {
         if (config.id === carouselId) {
           return {
             id: config.id,
@@ -91,7 +91,7 @@ class App extends Component {
         }
         return config;
       })
-    });
+    }));
   }
 
   restart() {
@@ -99,24 +99,24 @@ class App extends Component {
   }
 
   stop() {
-    const activeCarousels = this.state.carousels.filter(item => !item.halted);
-    if (activeCarousels.length > 0) {
-      this.haltCarousel(activeCarousels[0].id);
-    }
-    if (activeCarousels.length === 1) {
-      // set result message
-      const matchingImages = !!this.state.carousels.map(item => item.images[item.selectedIndex]).reduce(function(a, b){ return (a === b) ? a : NaN; });
-      if (matchingImages) {
-        this.setState({
-          status: 'you win!'
-        });
+    this.setState((prevState, props) => {
+      const activeCarousels = this.state.carousels.filter(item => !item.halted);
+      if (activeCarousels.length > 0) {
+        this.haltCarousel(activeCarousels[0].id);
       }
-      else {
-        this.setState({
+      if (activeCarousels.length === 1) {
+        // set result message: check whether the images match
+        const matchingImages = !!this.state.carousels.map(item => item.images[item.selectedIndex]).reduce(function(a, b){ return (a === b) ? a : NaN; });
+        if (matchingImages) {
+          return {
+            status: 'you win!'
+          };
+        }
+        return {
           status: 'you loose!'
-        });
+        };
       }
-    }
+    });
   }
 
   onChangeDirection(event) {
