@@ -15,12 +15,19 @@ class App extends Component {
   constructor() {
     super();
     this.state = this.getInitialConfig();
-    setInterval(() => this.tick(), 100);
 
     this.haltCarousel = this.haltCarousel.bind(this);
     this.restart = this.restart.bind(this);
     this.stop = this.stop.bind(this);
     this.onChangeDirection = this.onChangeDirection.bind(this);
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(() => this.tick(), 100);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   getInitialConfig() {
@@ -52,23 +59,23 @@ class App extends Component {
 
 // todo: respect asynchronity of setState
   tick() {
-    this.setState((prevState, props) => ({
-      carousels: prevState.carousels.map(config => {
+    this.setState({
+      carousels: this.state.carousels.map(config => {
         if (config.halted) {
           return config;
         }
         return {
           id: config.id,
           images: config.images,
-          selectedIndex: this.calculateNextIndex(prevState, config.selectedIndex, config.images.length),
+          selectedIndex: this.calculateNextIndex(config.selectedIndex, config.images.length),
           halted: config.halted
         }
       })
-    }));
+    });
   }
 
-  calculateNextIndex(state, curIndex, imageCount) {
-    if (state.slideDirectionDown) {
+  calculateNextIndex(curIndex, imageCount) {
+    if (this.state.slideDirectionDown) {
       let index = curIndex - 1;
       if (index < 0) {
         index = index + imageCount;
@@ -79,8 +86,8 @@ class App extends Component {
   }
 
   haltCarousel(carouselId) {
-    this.setState((prevState, props) => ({
-      carousels: prevState.carousels.map(config => {
+    this.setState({
+      carousels: this.state.carousels.map(config => {
         if (config.id === carouselId) {
           return {
             id: config.id,
@@ -91,7 +98,7 @@ class App extends Component {
         }
         return config;
       })
-    }));
+    });
   }
 
   restart() {
@@ -99,7 +106,6 @@ class App extends Component {
   }
 
   stop() {
-    this.setState((prevState, props) => {
       const activeCarousels = this.state.carousels.filter(item => !item.halted);
       if (activeCarousels.length > 0) {
         this.haltCarousel(activeCarousels[0].id);
@@ -108,15 +114,16 @@ class App extends Component {
         // set result message: check whether the images match
         const matchingImages = !!this.state.carousels.map(item => item.images[item.selectedIndex]).reduce(function(a, b){ return (a === b) ? a : NaN; });
         if (matchingImages) {
-          return {
+          this.setState({
             status: 'you win!'
-          };
+          });
         }
-        return {
+        else {
+        this.setState({
           status: 'you loose!'
-        };
+        });
       }
-    });
+      }
   }
 
   onChangeDirection(event) {
